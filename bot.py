@@ -21,9 +21,10 @@ async def play(client, message):
     await message.reply(f"🔎 Searching: {song}")
 
     ydl_opts = {
-        "format": "bestaudio",
-        "outtmpl": "song.%(ext)s"
-    }
+    "format": "bestaudio/best",
+    "outtmpl": "%(title)s.%(ext)s",
+    "quiet": True
+}
 
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(f"ytsearch:{song}", download=True)['entries'][0]
