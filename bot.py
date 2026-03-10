@@ -29,5 +29,5 @@ async def play(client, message):
         info = ydl.extract_info(f"ytsearch:{song}", download=True)['entries'][0]
         file = ydl.prepare_filename(info)
 
-    await message.reply_audio(file, caption=f"🎧 {info['title']}")
+    await message.reply_document(file, caption=f"🎧 {info['title']}")
 app.run()
