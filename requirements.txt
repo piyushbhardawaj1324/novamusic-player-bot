@@ -1,5 +1,4 @@
 pyrogram
 tgcrypto
-py-tgcalls
+py-tgcalls>=2.0.0
 yt-dlp
-python-dotenv
