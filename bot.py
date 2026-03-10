@@ -39,15 +39,14 @@ async def play(_, message):
     await message.reply(f"🔎 Searching: {query}")
 
     ydl_opts = {
-        "format": "bestaudio",
-        "outtmpl": "%(title)s.%(ext)s",
-        "quiet": True
-    }
+    "format": "bestaudio/best",
+    "quiet": True,
+    "noplaylist": True
+}
 
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(f"ytsearch:{query}", download=True)['entries'][0]
-        file = ydl.prepare_filename(info)
-
+with YoutubeDL(ydl_opts) as ydl:
+    info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
+    file = info["url"]
     chat_id = message.chat.id
 
     if chat_id not in queues:
