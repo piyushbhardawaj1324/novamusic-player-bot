@@ -1,35 +1,56 @@
+import os
+import asyncio
 from pyrogram import Client, filters
-from pytgcalls import PyTgCalls, idle
-from pytgcalls.types import AudioPiped
-import config
+from pytgcalls import PyTgCalls
+from pytgcalls.types import MediaStream
+from yt_dlp import YoutubeDL
 
-# Initialize Bot and Assistant
-bot = Client("music_bot", api_id=config.API_ID, api_hash=config.API_HASH, bot_token=config.BOT_TOKEN)
-assistant = Client("assistant", api_id=config.API_ID, api_hash=config.API_HASH, session_string=config.SESSION_STRING)
+# Railway Variables से डेटा उठाना
+API_ID = int(os.environ.get("API_ID"))
+API_HASH = os.environ.get("API_HASH")
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+SESSION = os.environ.get("SESSION_STRING")
 
+# Bot और Assistant को सेटअप करना
+bot = Client("MusicBot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
+assistant = Client("Assistant", api_id=API_ID, api_hash=API_HASH, session_string=SESSION)
 call_py = PyTgCalls(assistant)
 
 @bot.on_message(filters.command("play") & filters.group)
-async def play_audio(client, message):
+async def play(client, message):
     if len(message.command) < 2:
-        return await message.reply("Provide a direct audio link!")
+        return await message.reply("गाने का नाम लिखें! उदाहरण: /play fitoor")
     
-    audio_url = message.text.split(None, 1)[1]
-    chat_id = message.chat.id
-    
-    await message.reply(f"🎵 **Playing:** {audio_url}")
-    await call_py.start()
-    await call_py.play(chat_id, AudioPiped(audio_url))
+    query = " ".join(message.command[1:])
+    m = await message.reply("🔎 गाना खोज रहा हूँ...")
+
+    try:
+        with YoutubeDL({"format": "bestaudio", "quiet": True}) as ydl:
+            info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
+            url = info['url']
+            title = info['title']
+
+        await call_py.start()
+        # नए वर्ज़न के लिए MediaStream का उपयोग
+        await call_py.play(message.chat.id, MediaStream(url))
+        await m.edit(f"🎵 **बज रहा है:** {title}")
+    except Exception as e:
+        await m.edit(f"❌ एरर आया: {str(e)}")
 
 @bot.on_message(filters.command("stop") & filters.group)
-async def stop_audio(client, message):
-    await call_py.leave_call(message.chat.id)
-    await message.reply("⏹ Stopped streaming.")
+async def stop(client, message):
+    try:
+        await call_py.leave_call(message.chat.id)
+        await message.reply("⏹ गाना बंद कर दिया गया है।")
+    except:
+        await message.reply("❌ अभी कोई गाना नहीं चल रहा है।")
 
-async def start_bot():
+# बॉट चालू करना
+async def main():
     await bot.start()
     await assistant.start()
-    await idle()
+    print("बॉट चालू हो गया है!")
+    await asyncio.Event().wait()
 
 if __name__ == "__main__":
-    start_bot()
+    asyncio.run(main())
