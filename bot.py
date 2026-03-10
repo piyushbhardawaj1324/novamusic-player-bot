@@ -30,3 +30,4 @@ async def play(client, message):
         file = ydl.prepare_filename(info)
 
     await message.reply_audio(file, caption=f"🎧 {info['title']}")
+app.run()
