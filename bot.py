@@ -2,13 +2,12 @@ import os
 from pyrogram import Client, filters
 from yt_dlp import YoutubeDL
 
-OWNER_ID = int(os.getenv("6317313711"))
-API_ID = int(os.getenv("36845222"))
-API_HASH = os.getenv("6b145a7819ea1f045e0b89877575530f")
-BOT_TOKEN = os.getenv("8674697438:AAES7ApBlzXGJl8muEemsq4GYbQIhwxunNk")
+OWNER_ID = int(os.getenv("OWNER_ID"))
+API_ID = int(os.getenv("API_ID"))
+API_HASH = os.getenv("API_HASH")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 app = Client("musicbot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
-
 @app.on_message(filters.command("start"))
 async def start(client, message):
     await message.reply("🎵 Nova Melody Music Bot Online\nUse /play songname")
