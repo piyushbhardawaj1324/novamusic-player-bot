@@ -47,6 +47,7 @@ async def play(_, message):
 with YoutubeDL(ydl_opts) as ydl:
     info = ydl.extract_info(f"ytsearch:{query}", download=False)['entries'][0]
     file = info["url"]
+
     chat_id = message.chat.id
 
     if chat_id not in queues:
