@@ -20,11 +20,13 @@ async def play(client, message):
     song = " ".join(message.command[1:])
     await message.reply(f"🔎 Searching: {song}")
 
-    ydl_opts = {"format": "bestaudio"}
-    with YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(f"ytsearch:{song}", download=False)['entries'][0]
-        url = info['url']
+    ydl_opts = {
+        "format": "bestaudio",
+        "outtmpl": "song.%(ext)s"
+    }
 
-    await message.reply(f"🎧 Playing: {info['title']}")
-    
-app.run()
+    with YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(f"ytsearch:{song}", download=True)['entries'][0]
+        file = ydl.prepare_filename(info)
+
+    await message.reply_audio(file, caption=f"🎧 {info['title']}")
